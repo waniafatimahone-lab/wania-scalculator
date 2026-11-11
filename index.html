@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wania - Simple Scientific Lavender Calculator</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Cinzel:wght@600;700&display=swap');
+
+    :root {
+      --lav-bg-top: #F5F0FA;
+      --lav-bg-bot: #DFD2EE;
+      --lav-chassis-top: #EDE3F9;
+      --lav-chassis-bot: #D8C7F0;
+      --lav-border: #C6B2E6;
+
+      --lav-screen-bg: #231835;
+      --lav-screen-border: #3C2954;
+      --lav-screen-glow: #ECDFFF;
+      --lav-screen-sub: #AF9BC8;
+
+      --lav-num-bg: #FFFFFF;
+      --lav-num-text: #3C225E;
+      --lav-num-shadow: #B6A2CE;
+
+      --lav-fn-bg: #E4D5F6;
+      --lav-fn-hover: #ECE0FC;
+      --lav-fn-press: #D5C2ED;
+      --lav-fn-text: #4E277B;
+      --lav-fn-shadow: #A891C8;
+
+      --lav-eq-bg: #8B5CF6;
+      --lav-eq-hover: #996EF8;
+      --lav-eq-press: #7743E4;
+      --lav-eq-shadow: #5E2EA6;
+
+      --lav-clear-bg: #D45E9F;
+      --lav-clear-hover: #DE6DAA;
+      --lav-clear-press: #BD488A;
+      --lav-clear-shadow: #943269;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: radial-gradient(circle at 50% 25%, #FAF7FD 0%, var(--lav-bg-top) 40%, var(--lav-bg-bot) 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      color: #3C225E;
+      user-select: none;
+    }
+
+    .chassis-shadow {
+      box-shadow:
+        0 20px 45px -10px rgba(78, 43, 115, 0.22),
+        0 0 0 1px var(--lav-border),
+        inset 0 1px 2px rgba(255, 255, 255, 0.9),
+        inset 0 -2px 4px rgba(78, 43, 115, 0.1);
+      border-radius: 2rem;
+    }
+
+    .recessed-display {
+      background: var(--lav-screen-bg);
+      border: 2px solid var(--lav-screen-border);
+      box-shadow:
+        inset 0 4px 10px rgba(12, 5, 20, 0.75),
+        0 1px 2px rgba(255, 255, 255, 0.8);
+      border-radius: 1.25rem;
+    }
+
+    .digits-glow {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--lav-screen-glow);
+      text-shadow: 0 0 14px rgba(236, 223, 255, 0.4);
+    }
+
+    .btn-key {
+      position: relative;
+      border-radius: 0.85rem;
+      font-weight: 700;
+      transition: all 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      outline: none;
+    }
+
+    .btn-num {
+      background: var(--lav-num-bg);
+      color: var(--lav-num-text);
+      box-shadow:
+        0 4px 0 var(--lav-num-shadow),
+        0 5px 6px rgba(70, 35, 105, 0.12),
+        inset 0 1px 0 #FFFFFF;
+    }
+    .btn-num:hover {
+      background: #FFFFFF;
+      transform: translateY(-1px);
+      box-shadow:
+        0 5px 0 var(--lav-num-shadow),
+        0 7px 10px rgba(70, 35, 105, 0.18),
+        inset 0 1px 0 #FFFFFF;
+    }
+    .btn-num:active {
+      transform: translateY(3px);
+      box-shadow:
+        0 1px 0 var(--lav-num-shadow),
+        0 2px 4px rgba(70, 35, 105, 0.15);
+      background: #F4EDFA;
+    }
+
+    .btn-fn {
+      background: linear-gradient(180deg, var(--lav-fn-bg) 0%, #D8C6EE 100%);
+      color: var(--lav-fn-text);
+      box-shadow:
+        0 4px 0 var(--lav-fn-shadow),
+        0 5px 6px rgba(70, 35, 105, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+    .btn-fn:hover {
+      background: var(--lav-fn-hover);
+      transform: translateY(-1px);
+      box-shadow:
+        0 5px 0 var(--lav-fn-shadow),
+        0 7px 10px rgba(70, 35, 105, 0.18);
+    }
+    .btn-fn:active {
+      transform: translateY(3px);
+      box-shadow:
+        0 1px 0 var(--lav-fn-shadow),
+        0 2px 4px rgba(70, 35, 105, 0.12);
+      background: var(--lav-fn-press);
+    }
+
+    .btn-equals {
+      background: linear-gradient(180deg, var(--lav-eq-bg) 0%, #7C3AED 100%);
+      color: #FFFFFF;
+      box-shadow:
+        0 4px 0 var(--lav-eq-shadow),
+        0 6px 10px rgba(94, 46, 166, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .btn-equals:hover {
+      background: linear-gradient(180deg, var(--lav-eq-hover) 0%, #8347ED 100%);
+      transform: translateY(-1px);
+      box-shadow:
+        0 5px 0 var(--lav-eq-shadow),
+        0 8px 12px rgba(94, 46, 166, 0.45);
+    }
+    .btn-equals:active {
+      transform: translateY(3px);
+      box-shadow:
+        0 1px 0 var(--lav-eq-shadow),
+        0 2px 4px rgba(94, 46, 166, 0.3);
+      background: var(--lav-eq-press);
+    }
+
+    .btn-clear {
+      background: linear-gradient(180deg, var(--lav-clear-bg) 0%, #C34B8B 100%);
+      color: #FFFFFF;
+      box-shadow:
+        0 4px 0 var(--lav-clear-shadow),
+        0 5px 8px rgba(148, 50, 105, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .btn-clear:hover {
+      background: linear-gradient(180deg, var(--lav-clear-hover) 0%, #CD5696 100%);
+      transform: translateY(-1px);
+      box-shadow:
+        0 5px 0 var(--lav-clear-shadow),
+        0 7px 10px rgba(148, 50, 105, 0.35);
+    }
+    .btn-clear:active {
+      transform: translateY(3px);
+      box-shadow:
+        0 1px 0 var(--lav-clear-shadow),
+        0 2px 4px rgba(148, 50, 105, 0.2);
+      background: var(--lav-clear-press);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Calculator Chassis -->
+  <div class="relative w-full max-w-[390px] bg-gradient-to-b from-[#EDE3F9] to-[#D8C7F0] p-6 chassis-shadow">
+
+    <!-- Top Header -->
+    <div class="flex items-center justify-between pb-3.5 border-b border-[#C6B2E6]/40 mb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-purple-600 text-sm">✦</span>
+        <h1 class="font-['Cinzel'] text-xl font-bold tracking-wider text-[#3C225E]">WANIA</h1>
+        <span class="text-purple-600 text-sm">✦</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] tracking-widest font-extrabold text-[#75529E] uppercase">Lavender Edition</span>
+        <button id="soundBtn" title="Toggle Sound" class="w-7 h-7 rounded-full bg-white/60 hover:bg-white text-xs font-bold text-[#5B3782] shadow-sm flex items-center justify-center transition-all">
+          🔔
+        </button>
+      </div>
+    </div>
+
+    <!-- Recessed Display -->
+    <div class="recessed-display p-4 mb-4">
+      <div class="flex items-center justify-between mb-1.5">
+        <span id="badgeDeg" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold text-purple-300 bg-purple-900/40 border border-purple-500/30">
+          DEG
+        </span>
+        <span class="text-[10px] text-[#8C76A6] font-mono">SCIENTIFIC</span>
+      </div>
+
+      <!-- Expression History Line -->
+      <div id="exprLine" class="h-5 font-mono text-xs text-[var(--lav-screen-sub)] text-right truncate">
+        &nbsp;
+      </div>
+
+      <!-- Main Result Readout -->
+      <div id="readout" class="digits-glow text-right font-bold text-3xl sm:text-4xl tracking-tight overflow-x-auto whitespace-nowrap scrollbar-none py-1">
+        0
+      </div>
+    </div>
+
+    <!-- Keypad: 6 Rows x 5 Columns Simple Scientific Matrix -->
+    <div class="grid grid-cols-5 gap-2 sm:gap-2.5">
+
+      <!-- Row 1: Quick trig & Clear -->
+      <button data-key="DEG" class="btn-key btn-fn h-11 text-xs">DEG</button>
+      <button data-key="sin" class="btn-key btn-fn h-11 text-xs">sin</button>
+      <button data-key="cos" class="btn-key btn-fn h-11 text-xs">cos</button>
+      <button data-key="tan" class="btn-key btn-fn h-11 text-xs">tan</button>
+      <button data-key="AC" class="btn-key btn-clear h-11 text-xs font-bold">AC</button>
+
+      <!-- Row 2: Powers, Roots & Backspace -->
+      <button data-key="√" class="btn-key btn-fn h-11 text-sm font-bold">√</button>
+      <button data-key="x²" class="btn-key btn-fn h-11 text-xs">x²</button>
+      <button data-key="^" class="btn-key btn-fn h-11 text-sm font-bold">^</button>
+      <button data-key="π" class="btn-key btn-fn h-11 text-sm font-bold">π</button>
+      <button data-key="del" class="btn-key btn-clear h-11 text-sm font-bold">⌫</button>
+
+      <!-- Row 3: log & 7 8 9 ÷ -->
+      <button data-key="log" class="btn-key btn-fn h-11 text-xs">log</button>
+      <button data-key="7" class="btn-key btn-num h-11 text-lg">7</button>
+      <button data-key="8" class="btn-key btn-num h-11 text-lg">8</button>
+      <button data-key="9" class="btn-key btn-num h-11 text-lg">9</button>
+      <button data-key="div" class="btn-key btn-fn h-11 text-base font-bold">÷</button>
+
+      <!-- Row 4: ln & 4 5 6 × -->
+      <button data-key="ln" class="btn-key btn-fn h-11 text-xs">ln</button>
+      <button data-key="4" class="btn-key btn-num h-11 text-lg">4</button>
+      <button data-key="5" class="btn-key btn-num h-11 text-lg">5</button>
+      <button data-key="6" class="btn-key btn-num h-11 text-lg">6</button>
+      <button data-key="mul" class="btn-key btn-fn h-11 text-base font-bold">×</button>
+
+      <!-- Row 5: ( & 1 2 3 − -->
+      <button data-key="lparen" class="btn-key btn-fn h-11 text-sm font-bold">(</button>
+      <button data-key="1" class="btn-key btn-num h-11 text-lg">1</button>
+      <button data-key="2" class="btn-key btn-num h-11 text-lg">2</button>
+      <button data-key="3" class="btn-key btn-num h-11 text-lg">3</button>
+      <button data-key="sub" class="btn-key btn-fn h-11 text-base font-bold">−</button>
+
+      <!-- Row 6: ) & 0 . = + -->
+      <button data-key="rparen" class="btn-key btn-fn h-11 text-sm font-bold">)</button>
+      <button data-key="0" class="btn-key btn-num h-11 text-lg">0</button>
+      <button data-key="dot" class="btn-key btn-num h-11 text-lg font-bold">.</button>
+      <button data-key="eq" class="btn-key btn-equals h-11 text-xl font-bold">=</button>
+      <button data-key="add" class="btn-key btn-fn h-11 text-base font-bold">＋</button>
+
+    </div>
+
+    <!-- Footer Note -->
+    <div class="mt-3.5 pt-2.5 border-t border-[#C6B2E6]/30 flex items-center justify-between text-[11px] text-[#7E659A]">
+      <span>Simple Lavender Calculator</span>
+      <span>Precision Math</span>
+    </div>
+
+  </div>
+
+  <script>
+    let expression = '';
+    let currentInput = '0';
+    let isDegreeMode = true;
+    let startNewNumber = true;
+    let soundOn = true;
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function chime(freq = 720) {
+      if (!soundOn) return;
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch (e) {}
+    }
+
+    const readout = document.getElementById('readout');
+    const exprLine = document.getElementById('exprLine');
+    const badgeDeg = document.getElementById('badgeDeg');
+    const soundBtn = document.getElementById('soundBtn');
+
+    soundBtn.addEventListener('click', () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? '🔔' : '🔕';
+    });
+
+    function formatNumber(num) {
+      if (isNaN(num)) return 'NaN';
+      if (!isFinite(num)) return num > 0 ? 'Infinity' : '-Infinity';
+      const rounded = Math.round(num * 1e10) / 1e10;
+      return String(rounded);
+    }
+
+    function updateView() {
+      readout.textContent = currentInput;
+      exprLine.innerHTML = expression || '&nbsp;';
+      if (currentInput.length > 12) {
+        readout.className = 'digits-glow text-right font-bold text-2xl tracking-tight overflow-x-auto whitespace-nowrap py-1';
+      } else if (currentInput.length > 8) {
+        readout.className = 'digits-glow text-right font-bold text-3xl tracking-tight overflow-x-auto whitespace-nowrap py-1';
+      } else {
+        readout.className = 'digits-glow text-right font-bold text-4xl tracking-tight overflow-x-auto whitespace-nowrap py-1';
+      }
+    }
+
+    function appendNum(d) {
+      if (startNewNumber || currentInput === '0') {
+        currentInput = d;
+        startNewNumber = false;
+      } else {
+        if (currentInput.replace('.', '').length < 14) {
+          currentInput += d;
+        }
+      }
+      updateView();
+    }
+
+    function appendDot() {
+      if (startNewNumber) {
+        currentInput = '0.';
+        startNewNumber = false;
+      } else if (!currentInput.includes('.')) {
+        currentInput += '.';
+      }
+      updateView();
+    }
+
+    function handleAction(key) {
+      chime(key === 'eq' ? 950 : 680);
+      try {
+        switch (key) {
+          case '0': case '1': case '2': case '3': case '4':
+          case '5': case '6': case '7': case '8': case '9':
+            appendNum(key);
+            break;
+          case 'dot':
+            appendDot();
+            break;
+          case 'add': case 'sub': case 'mul': case 'div': case '^':
+            let op = '+';
+            if (key === 'sub') op = '-';
+            if (key === 'mul') op = '*';
+            if (key === 'div') op = '/';
+            if (key === '^') op = '^';
+
+            expression += `${currentInput} ${op} `;
+            startNewNumber = true;
+            updateView();
+            break;
+
+          case 'lparen':
+            expression += (startNewNumber || currentInput === '0') ? '(' : `${currentInput} * (`;
+            currentInput = '0';
+            startNewNumber = true;
+            updateView();
+            break;
+
+          case 'rparen':
+            expression += `${currentInput})`;
+            startNewNumber = true;
+            updateView();
+            break;
+
+          case 'AC':
+            expression = '';
+            currentInput = '0';
+            startNewNumber = true;
+            exprLine.innerHTML = '&nbsp;';
+            updateView();
+            break;
+
+          case 'del':
+            if (startNewNumber || currentInput === '0') return;
+            currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : '0';
+            if (currentInput === '-') currentInput = '0';
+            if (currentInput === '0') startNewNumber = true;
+            updateView();
+            break;
+
+          case 'DEG':
+            isDegreeMode = !isDegreeMode;
+            badgeDeg.textContent = isDegreeMode ? 'DEG' : 'RAD';
+            break;
+
+          case 'π':
+            currentInput = formatNumber(Math.PI);
+            startNewNumber = true;
+            updateView();
+            break;
+
+          case 'sin': case 'cos': case 'tan':
+          case 'log': case 'ln': case '√': case 'x²':
+            applyScientific(key);
+            break;
+
+          case 'eq':
+            evaluate();
+            break;
+        }
+      } catch (e) {
+        readout.textContent = 'Error';
+        exprLine.textContent = 'Math Error';
+        startNewNumber = true;
+      }
+    }
+
+    function applyScientific(func) {
+      const val = parseFloat(currentInput);
+      let res = 0.0;
+      let label = '';
+
+      switch (func) {
+        case 'sin':
+          res = Math.sin(isDegreeMode ? (val * Math.PI / 180) : val);
+          label = `sin(${currentInput})`;
+          break;
+        case 'cos':
+          res = Math.cos(isDegreeMode ? (val * Math.PI / 180) : val);
+          label = `cos(${currentInput})`;
+          break;
+        case 'tan':
+          res = Math.tan(isDegreeMode ? (val * Math.PI / 180) : val);
+          label = `tan(${currentInput})`;
+          break;
+        case 'log':
+          if (val <= 0) throw new Error();
+          res = Math.log10(val);
+          label = `log(${currentInput})`;
+          break;
+        case 'ln':
+          if (val <= 0) throw new Error();
+          res = Math.log(val);
+          label = `ln(${currentInput})`;
+          break;
+        case '√':
+          if (val < 0) throw new Error();
+          res = Math.sqrt(val);
+          label = `√(${currentInput})`;
+          break;
+        case 'x²':
+          res = val * val;
+          label = `(${currentInput})²`;
+          break;
+      }
+
+      exprLine.textContent = label;
+      currentInput = formatNumber(res);
+      startNewNumber = true;
+      updateView();
+    }
+
+    function evaluate() {
+      if (!expression) return;
+      const full = expression + currentInput;
+      const cleaned = full.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+      const fn = new Function(`'use strict'; return (${cleaned.replace(/\\^/g, '**')});`);
+      const res = fn();
+      const formatted = formatNumber(res);
+      exprLine.textContent = `${full} =`;
+      currentInput = formatted;
+      expression = '';
+      startNewNumber = true;
+      updateView();
+    }
+
+    document.querySelectorAll('[data-key]').forEach(b => {
+      b.addEventListener('click', () => handleAction(b.getAttribute('data-key')));
+    });
+
+    window.addEventListener('keydown', (e) => {
+      const k = e.key;
+      if (k >= '0' && k <= '9') handleAction(k);
+      else if (k === '.') handleAction('dot');
+      else if (k === '+') handleAction('add');
+      else if (k === '-') handleAction('sub');
+      else if (k === '*' || k === 'x' || k === 'X') handleAction('mul');
+      else if (k === '/') handleAction('div');
+      else if (k === '^') handleAction('^');
+      else if (k === '=' || k === 'Enter') handleAction('eq');
+      else if (k === 'Backspace') handleAction('del');
+      else if (k === 'Escape') handleAction('AC');
+      else if (k === '(') handleAction('lparen');
+      else if (k === ')') handleAction('rparen');
+    });
+  </script>
+</body>
+</html>
